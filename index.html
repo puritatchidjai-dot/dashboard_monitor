@@ -34,6 +34,30 @@
             </div>
         </div>
 
+        <div class="bg-gray-850 p-6 rounded-xl border border-cyan-500/30 mb-8 bg-gradient-to-r from-gray-800 to-gray-850">
+            <h2 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                <span>✨ ระบบวิเคราะห์อัจฉริยะโรงนอน (Smart Barracks Insights)</span>
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-gray-900/60 p-4 rounded-lg border border-gray-700/50">
+                    <p class="text-gray-400 text-xs font-medium">🌧️ แนวโน้มสภาพอากาศ</p>
+                    <p class="text-base font-bold mt-2 text-gray-300" id="weather_trend">--</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-lg border border-gray-700/50">
+                    <p class="text-gray-400 text-xs font-medium">🫁 เฝ้าระวังความอับชื้น</p>
+                    <p class="text-base font-bold mt-2 text-gray-300" id="mold_alert">--</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-lg border border-gray-700/50">
+                    <p class="text-gray-400 text-xs font-medium">💧 จุดน้ำค้าง (Dew Point)</p>
+                    <p class="text-xl font-bold mt-2 text-teal-400" id="dew_point">--</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-lg border border-gray-700/50">
+                    <p class="text-gray-400 text-xs font-medium">😴 คุณภาพการนอนหลับ</p>
+                    <p class="text-base font-bold mt-2 text-gray-300" id="sleep_quality">--</p>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-8">
             <h3 class="text-lg font-bold mb-4">📈 กราฟแนวโน้มดัชนีความร้อน (Heat Index) 20 รายการล่าสุด</h3>
             <div class="h-80 relative">
@@ -110,8 +134,8 @@
             const { data, error } = await sbClient
                 .from('heatstroke_logs_new')
                 .select('*')
-                .eq('location_name', 'โรงนอน') // 🛡️ กำแพงกั้นผี: ดึงเฉพาะข้อมูลที่ชื่อว่า "โรงนอน" เท่านั้น
-                .order('created_at', { ascending: false }) // ดึงข้อมูลล่าสุดขึ้นมาก่อน
+                .eq('location_name', 'โรงนอน') 
+                .order('created_at', { ascending: false }) 
                 .limit(20);
 
             if (error) {
@@ -122,7 +146,7 @@
             if (data && data.length > 0) {
                 const latest = data[0]; 
 
-                // --- อัปเดตข้อมูลการ์ด ---
+                // --- อัปเดตข้อมูลการ์ดเดิม ---
                 document.getElementById('room_temp').innerText = latest.temperature_c != null ? latest.temperature_c.toFixed(1) + ' °C' : '--';
                 document.getElementById('room_hum').innerText = latest.humidity_percent != null ? latest.humidity_percent.toFixed(0) + ' %' : '--';
                 document.getElementById('room_hi').innerText = latest.heat_index_c != null ? latest.heat_index_c.toFixed(1) + ' °C' : '--';
@@ -132,7 +156,74 @@
                 document.getElementById('field_lst').innerText = latest.field_surface_temp_c != null ? latest.field_surface_temp_c.toFixed(1) + ' °C' : '--';
                 document.getElementById('field_hi').innerText = latest.field_heat_index_c != null ? latest.field_heat_index_c.toFixed(1) + ' °C' : '--';
 
-                // --- อัปเดตตาราง ---
+                // 🌟 --- [ส่วนที่เพิ่มใหม่] คำนวณฟังก์ชันเสริมวิเคราะห์สภาพอากาศหน้าเว็บ ---
+                const roomTemp = latest.temperature_c;
+                const roomHum = latest.humidity_percent;
+
+                // ฟังก์ชันที่ 1: ดัชนีจุดน้ำค้าง (Dew Point) ด้วยสมการคณิตศาสตร์ Magnus-Tetens
+                if (roomTemp != null && roomHum != null) {
+                    const a = 17.271;
+                    const b = 237.7;
+                    const h_val = roomHum === 0 ? 0.01 : roomHum;
+                    const tempCalc = (a * roomTemp) / (b + roomTemp) + Math.log(h_val / 100.0);
+                    const dewPoint = (b * tempCalc) / (a - tempCalc);
+                    document.getElementById('dew_point').innerText = dewPoint.toFixed(1) + ' °C';
+                }
+
+                // ฟังก์ชันที่ 2: ระบบเฝ้าระวังความอับชื้น (Mold & Respiratory Alert)
+                const moldEl = document.getElementById('mold_alert');
+                if (roomHum != null) {
+                    if (roomHum >= 80) {
+                        moldEl.innerText = '🚨 DANGER (เสี่ยงเชื้อราสูง)';
+                        moldEl.className = 'text-base font-bold mt-2 text-red-500';
+                    } else if (roomHum >= 70) {
+                        moldEl.innerText = '⚠️ WARNING (ความชื้นสะสม)';
+                        moldEl.className = 'text-base font-bold mt-2 text-orange-400';
+                    } else {
+                        moldEl.innerText = '✅ NORMAL (ปกติ)';
+                        moldEl.className = 'text-base font-bold mt-2 text-green-400';
+                    }
+                }
+
+                // ฟังก์ชันที่ 3: ดัชนีคุณภาพการนอนหลับ (Thermal Comfort for Sleep)
+                const sleepEl = document.getElementById('sleep_quality');
+                if (roomTemp != null && roomHum != null) {
+                    if (roomTemp >= 24 && roomTemp <= 28 && roomHum >= 40 && roomHum <= 60) {
+                        sleepEl.innerText = '🤩 Excellent (หลับสบายมาก)';
+                        sleepEl.className = 'text-base font-bold mt-2 text-green-400';
+                    } else if (roomTemp > 28 || roomHum > 70) {
+                        sleepEl.innerText = '🥵 Poor (อบอ้าว/นอนไม่สบาย)';
+                        sleepEl.className = 'text-base font-bold mt-2 text-red-400';
+                    } else if (roomTemp < 24 || roomHum < 40) {
+                        sleepEl.innerText = '🥶 Fair (อากาศเย็นหรือแห้ง)';
+                        sleepEl.className = 'text-base font-bold mt-2 text-blue-400';
+                    } else {
+                        sleepEl.innerText = '🙂 Good (พักผ่อนได้ปกติ)';
+                        sleepEl.className = 'text-base font-bold mt-2 text-gray-200';
+                    }
+                }
+
+                // ฟังก์ชันที่ 4: พยากรณ์ฝนล่วงหน้า (Weather Trend)
+                // เนื่องจาก Supabase ไม่ได้เก็บค่า Pressure ผมจึงคำนวณแนวโน้มจากการเปลี่ยนแปลงความชื้นย้อนหลัง 5 รอบล็อกแทนครับ
+                const trendEl = document.getElementById('weather_trend');
+                if (data.length > 5 && data[5].humidity_percent != null && roomHum != null) {
+                    const pastHum = data[5].humidity_percent;
+                    const humDiff = roomHum - pastHum;
+                    if (humDiff >= 6.0) { // หากความชื้นฝั่งในร่มพุ่งสูงขึ้นเร็วผิดปกติ แปลว่าฝนกำลังจะตก/พายุเข้า
+                        trendEl.innerText = '🌧️ ฝนอาจตก (ความชื้นพุ่ง)';
+                        trendEl.className = 'text-base font-bold mt-2 text-cyan-400';
+                    } else if (humDiff <= -6.0) {
+                        trendEl.innerText = '☀️ แจ่มใส (ความชื้นลดลง)';
+                        trendEl.className = 'text-base font-bold mt-2 text-yellow-400';
+                    } else {
+                        trendEl.innerText = '📊 คงที่ (สภาพอากาศปกติ)';
+                        trendEl.className = 'text-base font-bold mt-2 text-gray-400';
+                    }
+                } else {
+                    trendEl.innerText = '📊 กำลังคำนวณแนวโน้ม...';
+                }
+
+                // --- อัปเดตตารางเดิม ---
                 const tbody = document.getElementById('table_body');
                 tbody.innerHTML = ''; 
                 
@@ -151,8 +242,7 @@
                     tbody.appendChild(tr);
                 });
 
-                // --- อัปเดตกราฟ ---
-                // กราฟควรพล็อตจาก ซ้าย(เวลาเก่า) -> ขวา(เวลาใหม่) จึงต้อง reverse array ก่อนนำไปใส่ใน Chart
+                // --- อัปเดตกราฟเดิม ---
                 const chartData = [...data].reverse();
                 heatChart.data.labels = chartData.map(d => new Date(d.created_at).toLocaleTimeString('th-TH'));
                 heatChart.data.datasets[0].data = chartData.map(d => d.heat_index_c);

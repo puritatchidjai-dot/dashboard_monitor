@@ -21,18 +21,18 @@
                 <h2 class="text-lg sm:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2">
                     <span>🛏️</span> ข้อมูลโรงนอน (ในร่ม)
                 </h2>
-                <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
-                    <div>
+                <div class="space-y-2.5 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-gray-400 text-xs sm:text-sm">อุณหภูมิอากาศ</p>
-                        <p class="text-xl sm:text-3xl font-bold mt-2" id="room_temp">--</p>
+                        <p class="text-xl sm:text-3xl font-bold text-white sm:mt-2" id="room_temp">--</p>
                     </div>
-                    <div>
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-gray-400 text-xs sm:text-sm">ความชื้น</p>
-                        <p class="text-xl sm:text-3xl font-bold mt-2" id="room_hum">--</p>
+                        <p class="text-xl sm:text-3xl font-bold text-white sm:mt-2" id="room_hum">--</p>
                     </div>
-                    <div>
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-blue-400 text-xs sm:text-sm font-bold">ดัชนีความร้อน (HI)</p>
-                        <p class="text-xl sm:text-3xl font-bold text-blue-400 mt-2" id="room_hi">--</p>
+                        <p class="text-xl sm:text-3xl font-bold text-blue-400 sm:mt-2" id="room_hi">--</p>
                     </div>
                 </div>
             </div>
@@ -41,22 +41,22 @@
                 <h2 class="text-lg sm:text-xl font-bold text-orange-400 mb-4 flex items-center gap-2">
                     <span>🪖</span> ข้อมูลลานฝึก (กลางแจ้ง)
                 </h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                    <div>
+                <div class="space-y-2.5 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-gray-400 text-xs sm:text-sm">อุณหภูมิอากาศ</p>
-                        <p class="text-lg sm:text-2xl font-bold mt-2" id="field_temp">--</p>
+                        <p class="text-xl sm:text-2xl font-bold text-white sm:mt-2" id="field_temp">--</p>
                     </div>
-                    <div>
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-gray-400 text-xs sm:text-sm">ความชื้น</p>
-                        <p class="text-lg sm:text-2xl font-bold mt-2" id="field_hum">--</p>
+                        <p class="text-xl sm:text-2xl font-bold text-white sm:mt-2" id="field_hum">--</p>
                     </div>
-                    <div>
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-red-400 text-xs sm:text-sm font-bold">อุณหภูมิพื้นผิว</p>
-                        <p class="text-lg sm:text-2xl font-bold text-red-400 mt-2" id="field_lst">--</p>
+                        <p class="text-xl sm:text-2xl font-bold text-red-400 sm:mt-2" id="field_lst">--</p>
                     </div>
-                    <div>
+                    <div class="flex justify-between items-center bg-gray-900/40 p-3 rounded-lg sm:bg-transparent sm:p-0 sm:flex-col sm:justify-center text-center">
                         <p class="text-orange-400 text-xs sm:text-sm font-bold">ดัชนี (HI)</p>
-                        <p class="text-lg sm:text-2xl font-bold text-orange-400 mt-2" id="field_hi">--</p>
+                        <p class="text-xl sm:text-2xl font-bold text-orange-400 sm:mt-2" id="field_hi">--</p>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
             <h2 class="text-lg sm:text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
                 <span>✨ ระบบวิเคราะห์อัจฉริยะโรงนอน (Smart Barracks Insights)</span>
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-center">
                 <div class="bg-gray-900/60 p-3 sm:p-4 rounded-lg border border-gray-700/50">
                     <p class="text-gray-400 text-xs font-medium">🌧️ แนวโน้มสภาพอากาศ</p>
                     <p class="text-sm sm:text-base font-bold mt-2 text-gray-300" id="weather_trend">--</p>
@@ -95,10 +95,10 @@
 
         <div class="bg-gray-800 p-4 sm:p-6 rounded-xl border border-gray-700">
             <h3 class="text-base sm:text-lg font-bold mb-4">⏱️ ล็อกข้อมูลล่าสุด (20 รายการ)</h3>
-            <div class="overflow-x-auto w-full">
-                <table class="w-full text-left min-w-[700px]">
+            <div class="overflow-x-auto w-full rounded-lg">
+                <table class="w-full text-left min-w-[650px]">
                     <thead>
-                        <tr class="text-gray-400 border-b border-gray-700 whitespace-nowrap text-sm sm:text-base">
+                        <tr class="text-gray-400 border-b border-gray-700 text-sm sm:text-base whitespace-nowrap">
                             <th class="pb-3 pr-2">เวลา (TIME)</th>
                             <th class="pb-3 pr-2 text-blue-400">อุณหภูมิโรงนอน</th>
                             <th class="pb-3 pr-2 text-blue-400">HI โรงนอน</th>
@@ -176,7 +176,7 @@
             if (data && data.length > 0) {
                 const latest = data[0]; 
 
-                // --- อัปเดตข้อมูลการ์ดเดิม ---
+                // --- อัปเดตข้อมูลการ์ดหลัก ---
                 document.getElementById('room_temp').innerText = latest.temperature_c != null ? latest.temperature_c.toFixed(1) + ' °C' : '--';
                 document.getElementById('room_hum').innerText = latest.humidity_percent != null ? latest.humidity_percent.toFixed(0) + ' %' : '--';
                 document.getElementById('room_hi').innerText = latest.heat_index_c != null ? latest.heat_index_c.toFixed(1) + ' °C' : '--';
@@ -205,13 +205,13 @@
                 if (roomHum != null) {
                     if (roomHum >= 80) {
                         moldEl.innerText = '🚨 DANGER (เสี่ยงเชื้อราสูง)';
-                        moldEl.className = 'text-sm sm:text-base font-bold mt-2 text-red-500';
+                        moldEl.className = 'text-xs sm:text-sm font-bold mt-2 text-red-500';
                     } else if (roomHum >= 70) {
                         moldEl.innerText = '⚠️ WARNING (ความชื้นสะสม)';
-                        moldEl.className = 'text-sm sm:text-base font-bold mt-2 text-orange-400';
+                        moldEl.className = 'text-xs sm:text-sm font-bold mt-2 text-orange-400';
                     } else {
                         moldEl.innerText = '✅ NORMAL (ปกติ)';
-                        moldEl.className = 'text-sm sm:text-base font-bold mt-2 text-green-400';
+                        moldEl.className = 'text-xs sm:text-sm font-bold mt-2 text-green-400';
                     }
                 }
 
@@ -220,16 +220,16 @@
                 if (roomTemp != null && roomHum != null) {
                     if (roomTemp >= 24 && roomTemp <= 28 && roomHum >= 40 && roomHum <= 60) {
                         sleepEl.innerText = '🤩 Excellent (หลับสบายมาก)';
-                        sleepEl.className = 'text-sm sm:text-base font-bold mt-2 text-green-400';
+                        sleepEl.className = 'text-xs sm:text-sm font-bold mt-2 text-green-400';
                     } else if (roomTemp > 28 || roomHum > 70) {
                         sleepEl.innerText = '🥵 Poor (อบอ้าว/นอนไม่สบาย)';
-                        sleepEl.className = 'text-sm sm:text-base font-bold mt-2 text-red-400';
+                        sleepEl.className = 'text-xs sm:text-sm font-bold mt-2 text-red-400';
                     } else if (roomTemp < 24 || roomHum < 40) {
                         sleepEl.innerText = '🥶 Fair (อากาศเย็นหรือแห้ง)';
-                        sleepEl.className = 'text-sm sm:text-base font-bold mt-2 text-blue-400';
+                        sleepEl.className = 'text-xs sm:text-sm font-bold mt-2 text-blue-400';
                     } else {
                         sleepEl.innerText = '🙂 Good (พักผ่อนได้ปกติ)';
-                        sleepEl.className = 'text-sm sm:text-base font-bold mt-2 text-gray-200';
+                        sleepEl.className = 'text-xs sm:text-sm font-bold mt-2 text-gray-200';
                     }
                 }
 
@@ -240,19 +240,19 @@
                     const humDiff = roomHum - pastHum;
                     if (humDiff >= 6.0) {
                         trendEl.innerText = '🌧️ ฝนอาจตก (ความชื้นพุ่ง)';
-                        trendEl.className = 'text-sm sm:text-base font-bold mt-2 text-cyan-400';
+                        trendEl.className = 'text-xs sm:text-sm font-bold mt-2 text-cyan-400';
                     } else if (humDiff <= -6.0) {
                         trendEl.innerText = '☀️ แจ่มใส (ความชื้นลดลง)';
-                        trendEl.className = 'text-sm sm:text-base font-bold mt-2 text-yellow-400';
+                        trendEl.className = 'text-xs sm:text-sm font-bold mt-2 text-yellow-400';
                     } else {
                         trendEl.innerText = '📊 คงที่ (สภาพอากาศปกติ)';
-                        trendEl.className = 'text-sm sm:text-base font-bold mt-2 text-gray-400';
+                        trendEl.className = 'text-xs sm:text-sm font-bold mt-2 text-gray-400';
                     }
                 } else {
-                    trendEl.innerText = '📊 กำลังคำนวณแนวโน้ม...';
+                    trendEl.innerText = '📊 กำลังคำนวณ...';
                 }
 
-                // --- อัปเดตตารางเดิม (เพิ่มคลาส whitespace-nowrap เพื่อให้เลื่อนขวาได้อย่างสวยงามบนมือถือ) ---
+                // --- อัปเดตตารางเดิม ---
                 const tbody = document.getElementById('table_body');
                 tbody.innerHTML = ''; 
                 

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24SOLDIER DASHBOARD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-900 text-white p-8 font-sans">
+    
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-cyan-400 mb-8">PRE-FLIGHT TEST: 24SOLDIER DASHBOARD</h1>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <h2 class="text-xl font-bold text-blue-400 mb-4">🛏️ ข้อมูลโรงนอน (ในร่ม)</h2>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div><p class="text-gray-400 text-sm">อุณหภูมิอากาศ</p><p class="text-3xl font-bold mt-2" id="room_temp">--</p></div>
+                    <div><p class="text-gray-400 text-sm">ความชื้น</p><p class="text-3xl font-bold mt-2" id="room_hum">--</p></div>
+                    <div><p class="text-blue-400 text-sm font-bold">ดัชนีความร้อน (HI)</p><p class="text-3xl font-bold text-blue-400 mt-2" id="room_hi">--</p></div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-orange-500/50">
+                <h2 class="text-xl font-bold text-orange-400 mb-4">🪖 ข้อมูลลานฝึก (กลางแจ้ง)</h2>
+                <div class="grid grid-cols-4 gap-4 text-center">
+                    <div><p class="text-gray-400 text-sm">อุณหภูมิอากาศ</p><p class="text-2xl font-bold mt-2" id="field_temp">--</p></div>
+                    <div><p class="text-gray-400 text-sm">ความชื้น</p><p class="text-2xl font-bold mt-2" id="field_hum">--</p></div>
+                    <div><p class="text-red-400 text-sm font-bold">อุณหภูมิพื้นผิว</p><p class="text-2xl font-bold text-red-400 mt-2" id="field_lst">--</p></div>
+                    <div><p class="text-orange-400 text-sm font-bold">ดัชนี (HI)</p><p class="text-2xl font-bold text-orange-400 mt-2" id="field_hi">--</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-8">
+            <h3 class="text-lg font-bold mb-4">📈 กราฟแนวโน้มดัชนีความร้อน (Heat Index) 20 รายการล่าสุด</h3>
+            <div class="h-80 relative">
+                <canvas id="heatChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+            <h3 class="text-lg font-bold mb-4">⏱️ ล็อกข้อมูลล่าสุด (20 รายการ)</h3>
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-400 border-b border-gray-700">
+                        <th class="pb-3">เวลา (TIME)</th>
+                        <th class="pb-3 text-blue-400">อุณหภูมิโรงนอน</th>
+                        <th class="pb-3 text-blue-400">HI โรงนอน</th>
+                        <th class="pb-3 text-orange-400">อุณหภูมิลานฝึก</th>
+                        <th class="pb-3 text-red-400">อุณหภูมิพื้นผิว</th>
+                        <th class="pb-3 text-orange-400">HI ลานฝึก</th>
+                    </tr>
+                </thead>
+                <tbody id="table_body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 1. ตั้งค่าการเชื่อมต่อ Supabase
+        const sbClient = window.supabase.createClient(
+            'https://iimanycmrpiielmrfvdy.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbWFueWNtcnBpaWVsbXJmdmR5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTA5NjI1OCwiZXhwIjoyMDk0NjcyMjU4fQ.rGKXHoi6Q4sB88KIfmgBVr-Am1CpXJL27KoAtZ73tPg'
+        );
+
+        // 2. ตั้งค่าและสร้างกราฟ Chart.js
+        const ctx = document.getElementById('heatChart').getContext('2d');
+        const heatChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { 
+                        label: 'HI โรงนอน', 
+                        data: [], 
+                        borderColor: '#60a5fa', 
+                        backgroundColor: '#60a5fa',
+                        tension: 0.4 
+                    },
+                    { 
+                        label: 'HI ลานฝึก', 
+                        data: [], 
+                        borderColor: '#fb923c', 
+                        backgroundColor: '#fb923c',
+                        tension: 0.4 
+                    }
+                ]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#e5e7eb' }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } },
+                    y: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } }
+                }
+            }
+        });
+
+        // 3. ฟังก์ชันดึงข้อมูลและอัปเดตทุกส่วน (การ์ด, ตาราง, กราฟ)
+        async function fetchWeatherData() {
+            const { data, error } = await sbClient
+                .from('heatstroke_logs_new')
+                .select('*')
+                .eq('location_name', 'โรงนอน') // 🛡️ กำแพงกั้นผี: ดึงเฉพาะข้อมูลที่ชื่อว่า "โรงนอน" เท่านั้น
+                .order('created_at', { ascending: false }) // ดึงข้อมูลล่าสุดขึ้นมาก่อน
+                .limit(20);
+
+            if (error) {
+                console.error('ดึงข้อมูลล้มเหลว:', error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                const latest = data[0]; 
+
+                // --- อัปเดตข้อมูลการ์ด ---
+                document.getElementById('room_temp').innerText = latest.temperature_c != null ? latest.temperature_c.toFixed(1) + ' °C' : '--';
+                document.getElementById('room_hum').innerText = latest.humidity_percent != null ? latest.humidity_percent.toFixed(0) + ' %' : '--';
+                document.getElementById('room_hi').innerText = latest.heat_index_c != null ? latest.heat_index_c.toFixed(1) + ' °C' : '--';
+
+                document.getElementById('field_temp').innerText = latest.field_temp_c != null ? latest.field_temp_c.toFixed(1) + ' °C' : '--';
+                document.getElementById('field_hum').innerText = latest.field_humidity_percent != null ? latest.field_humidity_percent.toFixed(0) + ' %' : '--';
+                document.getElementById('field_lst').innerText = latest.field_surface_temp_c != null ? latest.field_surface_temp_c.toFixed(1) + ' °C' : '--';
+                document.getElementById('field_hi').innerText = latest.field_heat_index_c != null ? latest.field_heat_index_c.toFixed(1) + ' °C' : '--';
+
+                // --- อัปเดตตาราง ---
+                const tbody = document.getElementById('table_body');
+                tbody.innerHTML = ''; 
+                
+                data.forEach(log => {
+                    const timeStr = new Date(log.created_at).toLocaleTimeString('th-TH');
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-700/50 hover:bg-gray-700/30 transition-colors';
+                    tr.innerHTML = `
+                        <td class="py-3">${timeStr}</td>
+                        <td class="py-3">${log.temperature_c != null ? log.temperature_c.toFixed(1) : '-'}</td>
+                        <td class="py-3 text-blue-400 font-bold">${log.heat_index_c != null ? log.heat_index_c.toFixed(1) : '-'}</td>
+                        <td class="py-3">${log.field_temp_c != null ? log.field_temp_c.toFixed(1) : '-'}</td>
+                        <td class="py-3 text-red-400">${log.field_surface_temp_c != null ? log.field_surface_temp_c.toFixed(1) : '-'}</td>
+                        <td class="py-3 text-orange-400 font-bold">${log.field_heat_index_c != null ? log.field_heat_index_c.toFixed(1) : '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // --- อัปเดตกราฟ ---
+                // กราฟควรพล็อตจาก ซ้าย(เวลาเก่า) -> ขวา(เวลาใหม่) จึงต้อง reverse array ก่อนนำไปใส่ใน Chart
+                const chartData = [...data].reverse();
+                heatChart.data.labels = chartData.map(d => new Date(d.created_at).toLocaleTimeString('th-TH'));
+                heatChart.data.datasets[0].data = chartData.map(d => d.heat_index_c);
+                heatChart.data.datasets[1].data = chartData.map(d => d.field_heat_index_c);
+                heatChart.update();
+            }
+        }
+
+        // 4. เริ่มการทำงาน
+        fetchWeatherData();
+        setInterval(fetchWeatherData, 30000);
+    </script>
+</body>
+</html>
